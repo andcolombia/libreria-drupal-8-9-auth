@@ -2,10 +2,10 @@ name: OpenID Connect
 type: module
 description: A pluggable client implementation for the OpenID Connect protocol.
 core_version_requirement: ^8.8 || ^9
-package: Other
+package: Security
 configure: openid_connect.admin_settings
 
-# Information added by Drupal.org packaging script on 2020-09-08
-version: '8.x-1.0-rc1'
+# Information added by Drupal.org packaging script on 2021-12-22
+version: '8.x-1.0+9-dev'
 project: 'openid_connect'
-datestamp: 1599584289
+datestamp: 1640194846

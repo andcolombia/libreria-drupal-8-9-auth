@@ -26,6 +26,7 @@ class OpenIDConnectGenericClient extends OpenIDConnectClientBase {
       'authorization_endpoint' => '',
       'token_endpoint' => '',
       'userinfo_endpoint' => '',
+      'endsession_endpoint' => '',
     ] + parent::defaultConfiguration();
   }
 
@@ -50,6 +51,11 @@ class OpenIDConnectGenericClient extends OpenIDConnectClientBase {
       '#type' => 'textfield',
       '#default_value' => $this->configuration['userinfo_endpoint'],
     ];
+    $form['endsession_endpoint'] = [
+      '#title' => $this->t('Endsession endpoint'),
+      '#type' => 'textfield',
+      '#default_value' => $this->configuration['endsession_endpoint'],
+    ];
 
     return $form;
   }
@@ -62,6 +68,7 @@ class OpenIDConnectGenericClient extends OpenIDConnectClientBase {
       'authorization' => $this->configuration['authorization_endpoint'],
       'token' => $this->configuration['token_endpoint'],
       'userinfo' => $this->configuration['userinfo_endpoint'],
+      'endsession' => $this->configuration['endsession_endpoint'],
     ];
   }
 

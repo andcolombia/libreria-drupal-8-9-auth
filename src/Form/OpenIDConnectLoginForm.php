@@ -9,9 +9,10 @@ use Drupal\openid_connect\OpenIDConnectSession;
 use Drupal\openid_connect\OpenIDConnectClaims;
 use Drupal\openid_connect\Plugin\OpenIDConnectClientManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Component\Utility\SerializableClosure;
 
 /**
- * Class OpenIDConnectLoginForm.
+ * Provides the OpenID Connect login form.
  *
  * @package Drupal\openid_connect\Form
  */
@@ -49,9 +50,9 @@ class OpenIDConnectLoginForm extends FormBase implements ContainerInjectionInter
    *   The OpenID Connect claims.
    */
   public function __construct(
-      OpenIDConnectSession $session,
-      OpenIDConnectClientManager $plugin_manager,
-      OpenIDConnectClaims $claims
+    OpenIDConnectSession $session,
+    OpenIDConnectClientManager $plugin_manager,
+    OpenIDConnectClaims $claims
   ) {
     $this->session = $session;
     $this->pluginManager = $plugin_manager;
@@ -64,7 +65,7 @@ class OpenIDConnectLoginForm extends FormBase implements ContainerInjectionInter
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('openid_connect.session'),
-      $container->get('plugin.manager.openid_connect_client.processor'),
+      $container->get('plugin.manager.openid_connect_client'),
       $container->get('openid_connect.claims')
     );
   }
@@ -79,6 +80,7 @@ class OpenIDConnectLoginForm extends FormBase implements ContainerInjectionInter
   /**
    * {@inheritdoc}
    */
+
   public function buildForm(array $form, FormStateInterface $form_state) {
     $definitions = $this->pluginManager->getDefinitions();
     foreach ($definitions as $client_id => $client) {
@@ -87,15 +89,34 @@ class OpenIDConnectLoginForm extends FormBase implements ContainerInjectionInter
         continue;
       }
 
-      $form['openid_connect_client_' . $client_id . '_login'] = [
-        '#type' => 'submit',
-        '#value' => $this->t('Log in with @client_title', [
-          '@client_title' => $client['label'],
-        ]),
-        '#name' => $client_id,
-        '#prefix' => '<div>',
-        '#suffix' => '</div>',
+      $form['tipo_identificacion'] = [
+        '#type' => 'select',
+        '#title' => t('Tipo de identificación'),
+        '#options' => [
+          'CC' => t('Cédula de ciudadanía'),
+          'EM' => t('Correo electrónico'),
+        ],
       ];
+
+      $form['identificacion'] = array(
+          '#type' => 'textfield',
+          '#title' => t('Identificación'),
+      );
+
+      $form['openid_connect_client_' . $client_id . '_login'] = array(
+        '#type' => 'submit',
+        '#value' => t('Entrar', array('@client_title' => $client['label'])),
+        '#name' => $client_id,
+        '#nameType' => 'login',
+      );
+  
+      $form['openid_connect_client_' . $client_id . '_register'] = array(
+        '#type' => 'submit',
+        '#value' => t('Registrar', array('@client_title' => $client['label'])),
+        '#name' => $client_id,
+        '#nameType' => 'register',
+      );
+
     }
     return $form;
   }
@@ -103,10 +124,12 @@ class OpenIDConnectLoginForm extends FormBase implements ContainerInjectionInter
   /**
    * {@inheritdoc}
    */
+
   public function submitForm(array &$form, FormStateInterface $form_state) {
+
     $this->session->saveDestination();
     $client_name = $form_state->getTriggeringElement()['#name'];
-
+    $type = $form_state->getTriggeringElement()['#nameType'];
     $configuration = $this->config('openid_connect.settings.' . $client_name)
       ->get('settings');
     /** @var \Drupal\openid_connect\Plugin\OpenIDConnectClientInterface $client */
@@ -116,7 +139,12 @@ class OpenIDConnectLoginForm extends FormBase implements ContainerInjectionInter
     );
     $scopes = $this->claims->getScopes();
     $_SESSION['openid_connect_op'] = 'login';
-    $response = $client->authorize($scopes, $form_state);
+    $login_hint = $form_state->getValue('tipo_identificacion').','.$form_state->getValue('identificacion');
+    $_SESSION['scopes'] = $scopes;
+    $_SESSION['login_hint'] = $login_hint;
+    $_SESSION['client_name'] = $client_name;
+    $_SESSION['configuration'] = $configuration;
+    $response = $client->authorize($scopes, $type, $login_hint);
     $form_state->setResponse($response);
   }
 

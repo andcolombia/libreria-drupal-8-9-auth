@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
  *
  * @package Drupal\openid_connect\Form
  */
-class OpenIDConnectAccountsForm extends FormBase implements ContainerInjectionInterface {
+class OpenIDConnectAccountsLogout extends FormBase implements ContainerInjectionInterface {
 
   /**
    * Drupal\Core\Session\AccountProxy definition.
