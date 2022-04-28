@@ -193,16 +193,16 @@ class OpenIDConnect {
    * The 'sub' (Subject Identifier) is a unique ID for the external provider to
    * identify the user.
    *
-   * @param array $user_data
+   * @param array|null $user_data
    *   The user data from OpenIDConnectClientInterface::decodeIdToken().
-   * @param array $userinfo
+   * @param array|null $userinfo
    *   The user claims from OpenIDConnectClientInterface::retrieveUserInfo().
    *
    * @return string|false
    *   The sub, or FALSE if there was an error.
    */
-  public function extractSub(array $user_data, array $userinfo) {
-    if (isset($user_data['sub'])) {
+  public function extractSub($user_data, $userinfo) {
+    if (isset($user_data) && isset($user_data['sub'])) {
       // If we have sub in both $user_data and $userinfo, return FALSE if they
       // differ. Otherwise return the one in $user_data.
       return (!isset($userinfo['sub']) || ($user_data['sub'] == $userinfo['sub'])) ? $user_data['sub'] : FALSE;
@@ -300,7 +300,7 @@ class OpenIDConnect {
    */
   public function completeAuthorization(OpenIDConnectClientInterface $client, array $tokens, &$destination) {
     if ($this->currentUser->isAuthenticated()) {
-      throw new \RuntimeException('User already logged in');
+      return FALSE;
     }
 
     $context = $this->buildContext($client, $tokens);
@@ -617,6 +617,7 @@ class OpenIDConnect {
             switch ($property_type) {
               case 'string':
               case 'string_long':
+              case 'list_string':
               case 'datetime':
                 $account->set($property_name, $claim_value);
                 break;

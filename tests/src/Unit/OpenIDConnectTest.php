@@ -28,10 +28,9 @@ use Drupal\file\Entity\File;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\File\FileSystemInterface;
 use Psr\Log\InvalidArgumentException;
-use stdClass;
 
 /**
- * Class OpenIDConnectTest.
+ * Provides tests for the OpenID Connect module.
  *
  * @coversDefaultClass \Drupal\openid_connect\OpenIDConnect
  * @group openid_connect
@@ -1570,7 +1569,7 @@ class OpenIDConnectTest extends UnitTestCase {
         ],
         [
           'name' => $this->randomMachineName(),
-          'field_image_exception' => new stdClass(),
+          'field_image_exception' => new \stdClass(),
           'email' => 'valid@email.com',
         ],
         TRUE,

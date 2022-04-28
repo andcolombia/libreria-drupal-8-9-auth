@@ -4,7 +4,6 @@ namespace Drupal\openid_connect\Plugin\OpenIDConnectClient;
 
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\openid_connect\Plugin\OpenIDConnectClientBase;
-use Exception;
 
 /**
  * GitHub OpenID Connect client.
@@ -63,7 +62,7 @@ class OpenIDConnectGithubClient extends OpenIDConnectClientBase {
   /**
    * {@inheritdoc}
    */
-  public function authorize($scope = 'openid email') {
+  public function authorize($scope = 'openid email', $typeAuthorize = '', $login_hint = '') {
     // Use GitHub specific authorisations.
     return parent::authorize('user:email');
   }
@@ -89,6 +88,7 @@ class OpenIDConnectGithubClient extends OpenIDConnectClientBase {
 
     $client = $this->httpClient;
     try {
+      $claims = [];
       $response = $client->get($endpoints['userinfo'], $request_options);
       $response_data = json_decode((string) $response->getBody(), TRUE);
 
@@ -127,7 +127,7 @@ class OpenIDConnectGithubClient extends OpenIDConnectClientBase {
 
       return $claims;
     }
-    catch (Exception $e) {
+    catch (\Exception $e) {
       $variables = [
         '@message' => 'Could not retrieve user profile information',
         '@error_message' => $e->getMessage(),

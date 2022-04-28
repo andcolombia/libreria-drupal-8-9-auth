@@ -17,15 +17,10 @@ openid_connect.settings:
       type: string
       label: 'Show external providers in user login form'
     userinfo_mappings:
-      type: mapping
-      label: 'OpenID Connect settings'
-      mapping:
-        timezone:
-          type: string
-          label: 'Timezone'
-        picture:
-          type: string
-          label: 'Picture'
+      type: sequence
+      label: 'User claims mapping'
+      sequence:
+        type: string
 
 openid_connect.settings.facebook:
   type: config_object
@@ -72,6 +67,9 @@ openid_connect.settings.generic:
         userinfo_endpoint:
           type: string
           label: 'Userinfo endpoint'
+        endsession_endpoint:
+          type: string
+          label: 'Endsession endpoint'
 
 openid_connect.settings.github:
   type: config_object
@@ -123,3 +121,23 @@ openid_connect.settings.linkedin:
         client_secret:
           type: string
           label: 'Client secret'
+
+openid_connect.settings.okta:
+  type: config_object
+  label: 'OpenID Connect Okta settings'
+  mapping:
+    enabled:
+      type: boolean
+      label: 'Enable client'
+    settings:
+      type: mapping
+      mapping:
+        client_id:
+          type: string
+          label: 'Client ID'
+        client_secret:
+          type: string
+          label: 'Client secret'
+        okta_domain:
+          type: string
+          label: 'Okta domain'
